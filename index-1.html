@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cozinha">
+<title>AlphaBri · Checklist Cozinha</title>
+<style>
+* { margin:0; padding:0; -webkit-box-sizing:border-box; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  width:100%; height:100%;
+  background:#141414;
+  font-family: -apple-system, Helvetica, Arial, sans-serif;
+  color:#e8e2d8;
+  overflow:hidden;
+}
+
+.screen {
+  display:none;
+  position:absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+  overflow:hidden;
+}
+.screen.active { display:block; }
+
+/* HOME */
+#screen-home { background:#141414; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+
+.home-inner {
+  min-height:100%;
+  padding:40px 28px;
+  display:-webkit-box; display:-webkit-flex; display:flex;
+  -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column;
+  -webkit-box-align:center; -webkit-align-items:center; align-items:center;
+  gap:28px;
+}
+
+.logo-icon  { font-size:52px; text-align:center; margin-bottom:4px; }
+.logo-brand { font-size:28px; font-weight:700; color:#fff; text-align:center; }
+.logo-sub   { font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:#c9973a; font-weight:600; text-align:center; margin-top:4px; }
+.home-greet { font-size:16px; color:#888; text-align:center; line-height:1.5; }
+
+.field-block { width:100%; }
+.field-label { font-size:11px; text-transform:uppercase; letter-spacing:0.25em; color:#888; font-weight:600; margin-bottom:10px; display:block; }
+
+.name-input {
+  width:100%; background:#1e1e1e; border:1.5px solid #333;
+  -webkit-border-radius:14px; border-radius:14px;
+  padding:18px 20px; font-size:20px;
+  font-family:-apple-system,Helvetica,Arial,sans-serif;
+  color:#fff; outline:none; -webkit-appearance:none;
+}
+.name-input:focus { border-color:#c9973a; }
+
+.turno-row { display:-webkit-box; display:-webkit-flex; display:flex; gap:12px; width:100%; }
+
+.turno-btn {
+  -webkit-box-flex:1; -webkit-flex:1; flex:1;
+  padding:18px 12px; background:#1e1e1e; border:1.5px solid #333;
+  -webkit-border-radius:14px; border-radius:14px;
+  color:#888; font-size:15px; font-family:-apple-system,Helvetica,Arial,sans-serif;
+  font-weight:500; cursor:pointer; text-align:center;
+}
+.turno-btn .em  { font-size:26px; display:block; margin-bottom:6px; }
+.turno-btn .sub { font-size:11px; color:#555; display:block; margin-top:4px; }
+.turno-btn.sel-e { border-color:#2d6a4f; background:rgba(45,106,79,0.15); color:#52b788; }
+.turno-btn.sel-s { border-color:#9b2226; background:rgba(155,34,38,0.15); color:#e07070; }
+
+.start-btn {
+  width:100%; padding:20px; background:#c9973a; border:none;
+  -webkit-border-radius:14px; border-radius:14px;
+  color:#141414; font-size:17px; font-family:-apple-system,Helvetica,Arial,sans-serif;
+  font-weight:700; cursor:pointer;
+}
+.start-btn:disabled { opacity:0.3; }
+
+/* CHECK */
+#screen-check {
+  background:#141414;
+  display:none; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column;
+}
+#screen-check.active { display:-webkit-box; display:-webkit-flex; display:flex; }
+
+.topbar {
+  background:#1e1e1e; padding:14px 20px; border-bottom:1px solid #2a2a2a;
+  -webkit-flex-shrink:0; flex-shrink:0;
+  display:-webkit-box; display:-webkit-flex; display:flex;
+  -webkit-box-pack:justify; -webkit-justify-content:space-between; justify-content:space-between;
+  -webkit-box-align:center; -webkit-align-items:center; align-items:center;
+}
+.t-title { font-size:18px; font-weight:700; color:#fff; }
+.t-sub   { font-size:12px; color:#888; margin-top:2px; }
+
+.badge { padding:6px 12px; -webkit-border-radius:20px; border-radius:20px; font-size:12px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; }
+.bg { background:rgba(45,106,79,0.2); color:#52b788; border:1px solid rgba(82,183,136,0.3); }
+.br { background:rgba(155,34,38,0.2); color:#e07070; border:1px solid rgba(224,112,112,0.3); }
+
+.prog-bar  { height:4px; background:#2a2a2a; -webkit-flex-shrink:0; flex-shrink:0; }
+.prog-fill { height:100%; background:#c9973a; width:0%; -webkit-transition:width 0.3s; transition:width 0.3s; }
+
+.check-body { -webkit-box-flex:1; -webkit-flex:1; flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:18px 20px; }
+
+.sec-t { font-size:10px; text-transform:uppercase; letter-spacing:0.3em; color:#c9973a; font-weight:600; margin-bottom:10px; margin-top:16px; }
+.sec-t:first-child { margin-top:0; }
+
+.check-row {
+  display:-webkit-box; display:-webkit-flex; display:flex;
+  -webkit-box-align:center; -webkit-align-items:center; align-items:center;
+  gap:12px; padding:14px 16px; background:#1e1e1e; border:1.5px solid #333;
+  -webkit-border-radius:12px; border-radius:12px; cursor:pointer; margin-bottom:8px;
+  -webkit-user-select:none; user-select:none;
+}
+.check-row.done { background:rgba(45,106,79,0.1); border-color:rgba(82,183,136,0.4); }
+.check-row.done .clbl { color:#666; text-decoration:line-through; }
+
+.ccirc {
+  width:28px; height:28px; -webkit-border-radius:50%; border-radius:50%;
+  border:2px solid #555;
+  display:-webkit-box; display:-webkit-flex; display:flex;
+  -webkit-box-align:center; -webkit-align-items:center; align-items:center;
+  -webkit-box-pack:center; -webkit-justify-content:center; justify-content:center;
+  -webkit-flex-shrink:0; flex-shrink:0; font-size:14px; color:transparent;
+}
+.check-row.done .ccirc { background:#2d6a4f; border-color:#2d6a4f; color:#fff; }
+.clbl { font-size:15px; font-weight:500; color:#e8e2d8; line-height:1.3; }
+
+/* STOCK */
+.stock-card { background:#1e1e1e; border:1px solid #333; -webkit-border-radius:12px; border-radius:12px; overflow:hidden; margin-bottom:12px; }
+.stock-hdr  { padding:12px 16px; background:#2a2a2a; font-size:11px; text-transform:uppercase; letter-spacing:0.2em; color:#c9973a; font-weight:600; }
+
+.col-hdr { display:-webkit-box; display:-webkit-flex; display:flex; padding:8px 16px; background:#222; border-bottom:1px solid #333; }
+.col-hdr .cp { -webkit-box-flex:1; flex:1; font-size:9px; text-transform:uppercase; letter-spacing:0.12em; color:#666; font-weight:600; }
+.col-hdr .cc { width:76px; font-size:9px; text-transform:uppercase; letter-spacing:0.1em; color:#666; font-weight:600; text-align:center; }
+
+.st-row { display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-align:center; -webkit-align-items:center; align-items:center; padding:10px 16px; border-bottom:1px solid #2a2a2a; gap:8px; }
+.st-row:last-child { border-bottom:none; }
+.st-prod { -webkit-box-flex:1; flex:1; font-size:14px; font-weight:500; color:#e8e2d8; }
+
+.iw { width:76px; display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; -webkit-box-align:center; -webkit-align-items:center; align-items:center; gap:3px; }
+.il { font-size:8px; text-transform:uppercase; letter-spacing:0.1em; color:#555; font-weight:600; }
+
+.si {
+  width:100%; background:#141414; border:1px solid #444;
+  -webkit-border-radius:8px; border-radius:8px;
+  padding:8px 4px; font-size:17px; font-family:-apple-system,Helvetica,Arial,sans-serif;
+  color:#fff; text-align:center; outline:none; -webkit-appearance:none;
+}
+.si:focus { border-color:#c9973a; }
+
+.bn {
+  -webkit-box-flex:1; flex:1; background:#141414; border:1px solid #444;
+  -webkit-border-radius:8px; border-radius:8px;
+  padding:10px; font-size:14px; font-style:italic;
+  font-family:-apple-system,Helvetica,Arial,sans-serif; color:#e8e2d8; outline:none; -webkit-appearance:none;
+}
+.bn:focus { border-color:#c9973a; }
+.bn::-webkit-input-placeholder { color:#444; }
+
+/* BOTTOM */
+.check-bot { background:#1e1e1e; border-top:1px solid #2a2a2a; padding:14px 20px; -webkit-flex-shrink:0; flex-shrink:0; }
+.prog-txt  { font-size:12px; color:#888; text-align:center; margin-bottom:10px; }
+.prog-txt span { color:#c9973a; font-weight:600; }
+
+.send-btn {
+  width:100%; padding:18px; background:#c9973a; border:none;
+  -webkit-border-radius:14px; border-radius:14px; color:#141414;
+  font-size:16px; font-family:-apple-system,Helvetica,Arial,sans-serif; font-weight:700; cursor:pointer;
+}
+
+/* SEND */
+#screen-send {
+  background:#141414; display:none;
+  -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column;
+  -webkit-box-pack:center; -webkit-justify-content:center; justify-content:center;
+  -webkit-box-align:center; -webkit-align-items:center; align-items:center;
+  padding:32px;
+}
+#screen-send.active { display:-webkit-box; display:-webkit-flex; display:flex; }
+
+.send-card { background:#1e1e1e; border:1px solid #333; -webkit-border-radius:20px; border-radius:20px; padding:36px 28px; width:100%; max-width:480px; }
+.si-icon  { font-size:52px; text-align:center; margin-bottom:16px; }
+.si-title { font-size:24px; font-weight:700; color:#fff; text-align:center; margin-bottom:8px; }
+.si-sub   { font-size:14px; color:#888; text-align:center; line-height:1.6; margin-bottom:24px; }
+
+.act-btn {
+  display:-webkit-box; display:-webkit-flex; display:flex;
+  -webkit-box-align:center; -webkit-align-items:center; align-items:center;
+  gap:14px; width:100%; padding:18px 20px;
+  -webkit-border-radius:14px; border-radius:14px;
+  border:1.5px solid #333; background:#2a2a2a; color:#e8e2d8;
+  font-size:15px; font-family:-apple-system,Helvetica,Arial,sans-serif;
+  font-weight:600; cursor:pointer; text-align:left; margin-bottom:12px; -webkit-appearance:none;
+}
+.act-btn.wpp { border-color:rgba(37,211,102,0.4); background:rgba(37,211,102,0.08); color:#25d366; }
+.act-btn.eml { border-color:rgba(201,151,58,0.4); background:rgba(201,151,58,0.08); color:#c9973a; }
+
+.ae { font-size:26px; }
+.ai { display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; gap:2px; }
+.al { font-size:15px; }
+.as { font-size:11px; font-weight:400; color:#666; }
+
+.new-btn {
+  width:100%; padding:16px; background:transparent; border:1.5px solid #333;
+  -webkit-border-radius:14px; border-radius:14px; color:#666;
+  font-size:14px; font-family:-apple-system,Helvetica,Arial,sans-serif; cursor:pointer; margin-top:4px;
+}
+</style>
+</head>
+<body>
+
+<div id="screen-home" class="screen active">
+  <div class="home-inner">
+    <div>
+      <div class="logo-icon">🍽️</div>
+      <div class="logo-brand">AlphaBri Bistrô</div>
+      <div class="logo-sub">Checklist da Cozinha</div>
+    </div>
+    <div class="home-greet">Olá! Qual é o seu nome<br>e o que você vai fazer?</div>
+    <div class="field-block">
+      <span class="field-label">Seu nome</span>
+      <input class="name-input" id="nome" type="text" placeholder="Ex: Maria, João..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="field-block">
+      <span class="field-label">Tipo de checklist</span>
+      <div class="turno-row">
+        <button class="turno-btn" id="btn-e" onclick="selT('entrada')">
+          <span class="em">🌅</span>Abertura<span class="sub">Chegando</span>
+        </button>
+        <button class="turno-btn" id="btn-s" onclick="selT('saida')">
+          <span class="em">🌙</span>Fechamento<span class="sub">Indo embora</span>
+        </button>
+      </div>
+    </div>
+    <button class="start-btn" id="start-btn" onclick="startCheck()" disabled>Iniciar Checklist →</button>
+  </div>
+</div>
+
+<div id="screen-check" class="screen">
+  <div class="topbar">
+    <div><div class="t-title" id="ct"></div><div class="t-sub" id="cs"></div></div>
+    <div class="badge" id="cb"></div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="pf"></div></div>
+  <div class="check-body" id="cbody"></div>
+  <div class="check-bot">
+    <div class="prog-txt" id="pt"></div>
+    <button class="send-btn" onclick="goSend()">Finalizar e Enviar Relatório</button>
+  </div>
+</div>
+
+<div id="screen-send" class="screen">
+  <div class="send-card">
+    <div class="si-icon">✅</div>
+    <div class="si-title">Checklist concluído!</div>
+    <div class="si-sub" id="ssub"></div>
+    <button class="act-btn wpp" onclick="sendWpp()">
+      <span class="ae">💬</span>
+      <span class="ai"><span class="al">Enviar pelo WhatsApp</span><span class="as">Abre o WhatsApp com o relatório</span></span>
+    </button>
+    <button class="act-btn eml" onclick="sendEmail()">
+      <span class="ae">📧</span>
+      <span class="ai"><span class="al">Enviar por E-mail</span><span class="as">Abre o app de e-mail</span></span>
+    </button>
+    <button class="new-btn" onclick="reset()">← Fazer novo checklist</button>
+  </div>
+</div>
+
+<script>
+var WPP   = '5511972069172';
+var MAIL  = 'cozinha@alphabri.com.br';
+
+var LISTA = {
+  entrada:['Lavar as mãos ao entrar','Colocar uniforme e avental limpos','Prender o cabelo / colocar touca','Verificar temperatura da geladeira e freezer','Checar validade dos insumos em uso','Higienizar bancadas e superfícies','Ligar equipamentos e testar funcionamento','Organizar mise en place do dia','Repor embalagens e descartáveis','Verificar nível de gás / energia','Checar limpeza do piso e lixeiras','Confirmar cardápio do bistrô do dia'],
+  saida:  ['Guardar e tampar todos os alimentos','Identificar e datar produtos preparados','Lavar toda a louça e utensílios','Limpar e higienizar bancadas','Limpar fogão, forno e equipamentos','Desligar todos os equipamentos','Fechar torneiras e verificar ralos','Esvaziar e higienizar lixeiras','Varrer e passar pano no piso','Conferir geladeira e freezer fechados','Apagar as luzes da cozinha','Registrar ocorrências do dia (se houver)']
+};
+var SALS = ['Coxinha','Croissant','Pão de Queijo','Pastel Integral','Esfiha de Carne'];
+
+var st = {nome:'',turno:'',checks:[]};
+
+document.getElementById('nome').addEventListener('input', function(){ valHome(); });
+
+function selT(t) {
+  st.turno = t;
+  document.getElementById('btn-e').className = 'turno-btn' + (t==='entrada' ? ' sel-e' : '');
+  document.getElementById('btn-s').className = 'turno-btn' + (t==='saida'   ? ' sel-s' : '');
+  valHome();
+}
+
+function valHome() {
+  var ok = document.getElementById('nome').value.trim() !== '' && st.turno !== '';
+  document.getElementById('start-btn').disabled = !ok;
+}
+
+function startCheck() {
+  st.nome = document.getElementById('nome').value.trim();
+  st.checks = [];
+  var n = LISTA[st.turno].length;
+  for (var i = 0; i < n; i++) st.checks.push(false);
+  build();
+  show('screen-check');
+}
+
+function build() {
+  var t = st.turno;
+  document.getElementById('ct').textContent = t==='entrada' ? 'Checklist de Entrada' : 'Checklist de Saída';
+  document.getElementById('cs').textContent = st.nome + ' · ' + hoje();
+  document.getElementById('cb').textContent = t==='entrada' ? '🌅 Abertura' : '🌙 Fechamento';
+  document.getElementById('cb').className   = 'badge ' + (t==='entrada' ? 'bg' : 'br');
+
+  var body = document.getElementById('cbody');
+  body.innerHTML = '';
+
+  var sb = mkStock(t);
+  var ck = mkChecks(t);
+
+  if (t === 'saida') { body.appendChild(sb); body.appendChild(ck); }
+  else               { body.appendChild(ck); body.appendChild(sb); }
+
+  prog();
+}
+
+function mkChecks(t) {
+  var d = document.createElement('div');
+  var tl = document.createElement('div');
+  tl.className = 'sec-t';
+  tl.textContent = t==='entrada' ? '✅ Rotina de Abertura' : '✅ Rotina de Fechamento';
+  d.appendChild(tl);
+  var lista = LISTA[t];
+  for (var i = 0; i < lista.length; i++) {
+    (function(idx){
+      var row = document.createElement('div');
+      row.className = 'check-row';
+      row.id = 'r'+idx;
+      var c = document.createElement('div');
+      c.className = 'ccirc'; c.id = 'c'+idx; c.textContent = '';
+      var l = document.createElement('div');
+      l.className = 'clbl'; l.textContent = lista[idx];
+      row.appendChild(c); row.appendChild(l);
+      row.onclick = function(){ tog(idx); };
+      d.appendChild(row);
+    })(i);
+  }
+  return d;
+}
+
+function mkStock(t) {
+  var d = document.createElement('div');
+  var tl = document.createElement('div');
+  tl.className = 'sec-t'; tl.textContent = '📦 Contagem de Estoque';
+  d.appendChild(tl);
+
+  // Salgados
+  var c1 = document.createElement('div'); c1.className = 'stock-card';
+  var h1 = document.createElement('div'); h1.className = 'stock-hdr'; h1.textContent = 'Salgados Pissani';
+  c1.appendChild(h1);
+  var ch = document.createElement('div'); ch.className = 'col-hdr';
+  ch.innerHTML = '<div class="cp">Produto</div><div class="cc">Sacolas<br>Fechadas</div><div class="cc">Unids<br>Abertas</div>';
+  c1.appendChild(ch);
+  for (var i = 0; i < SALS.length; i++) {
+    var row = document.createElement('div'); row.className = 'st-row';
+    var p = document.createElement('div'); p.className = 'st-prod'; p.textContent = SALS[i];
+    row.appendChild(p);
+    row.appendChild(mkIW('sacolas', t+'ss'+i));
+    row.appendChild(mkIW('unids',   t+'su'+i));
+    c1.appendChild(row);
+  }
+  d.appendChild(c1);
+
+  // Bistrô
+  var c2 = document.createElement('div'); c2.className = 'stock-card';
+  var h2 = document.createElement('div'); h2.className = 'stock-hdr'; h2.textContent = 'Bistrô · Porções';
+  c2.appendChild(h2);
+  var ch2 = document.createElement('div'); ch2.className = 'col-hdr';
+  if (t==='entrada') ch2.innerHTML = '<div class="cp">Prato do Dia</div><div class="cc">Preparo</div><div class="cc">Prev.<br>Vendas</div>';
+  else               ch2.innerHTML = '<div class="cp">Prato do Dia</div><div class="cc">Vendidas</div><div class="cc">Sobra</div>';
+  c2.appendChild(ch2);
+  for (var j = 0; j < 4; j++) {
+    var br = document.createElement('div'); br.className = 'st-row';
+    var bn = document.createElement('input');
+    bn.className = 'bn'; bn.type='text'; bn.placeholder='Nome do prato…';
+    bn.id = t+'bn'+j; bn.autocomplete='off';
+    br.appendChild(bn);
+    br.appendChild(mkIW(t==='entrada'?'preparo':'vendidas', t+'bp'+j));
+    br.appendChild(mkIW(t==='entrada'?'prev.':'sobra',     t+'bv'+j));
+    c2.appendChild(br);
+  }
+  d.appendChild(c2);
+  return d;
+}
+
+function mkIW(lbl, id) {
+  var w = document.createElement('div'); w.className = 'iw';
+  var l = document.createElement('div'); l.className = 'il'; l.textContent = lbl;
+  var i = document.createElement('input');
+  i.className='si'; i.type='number'; i.id=id; i.placeholder='0'; i.min='0';
+  w.appendChild(l); w.appendChild(i);
+  return w;
+}
+
+function tog(i) {
+  st.checks[i] = !st.checks[i];
+  var row = document.getElementById('r'+i);
+  var cir = document.getElementById('c'+i);
+  if (st.checks[i]) { row.className='check-row done'; cir.textContent='✓'; }
+  else              { row.className='check-row';      cir.textContent='';  }
+  prog();
+}
+
+function prog() {
+  var done=0;
+  for (var i=0;i<st.checks.length;i++) if(st.checks[i]) done++;
+  var tot = st.checks.length;
+  var pct = tot ? Math.round(done/tot*100) : 0;
+  document.getElementById('pf').style.width = pct+'%';
+  document.getElementById('pt').innerHTML = '<span>'+done+'/'+tot+'</span> itens marcados';
+}
+
+function goSend() {
+  var done=0;
+  for(var i=0;i<st.checks.length;i++) if(st.checks[i]) done++;
+  var t = st.turno==='entrada'?'Abertura':'Fechamento';
+  document.getElementById('ssub').textContent = st.nome+' · '+t+' · '+hoje()+'\n'+done+' de '+st.checks.length+' itens concluídos.';
+  show('screen-send');
+}
+
+function rel() {
+  var t  = st.turno==='entrada'?'ABERTURA':'FECHAMENTO';
+  var em = st.turno==='entrada'?'🌅':'🌙';
+  var L  = [];
+  L.push(em+' *CHECKLIST DE '+t+' — AlphaBri Bistrô*');
+  L.push('📅 '+hoje()); L.push('👤 '+st.nome); L.push('');
+  L.push('*✅ ROTINA*');
+  var lista = LISTA[st.turno];
+  for(var i=0;i<lista.length;i++) L.push((st.checks[i]?'✅':'⬜')+' '+lista[i]);
+  var done=0; for(var j=0;j<st.checks.length;j++) if(st.checks[j]) done++;
+  L.push(''); L.push('Concluído: '+done+'/'+st.checks.length+' itens'); L.push('');
+  L.push('*📦 SALGADOS*');
+  for(var s=0;s<SALS.length;s++) {
+    var sac=gv(st.turno+'ss'+s); var uni=gv(st.turno+'su'+s);
+    L.push('• '+SALS[s]+': '+sac+' sacolas / '+uni+' unids abertas');
+  }
+  L.push(''); L.push('*🍝 BISTRÔ*');
+  for(var b=0;b<4;b++) {
+    var nm=gvt(st.turno+'bn'+b); if(!nm) continue;
+    var p=gv(st.turno+'bp'+b); var v=gv(st.turno+'bv'+b);
+    if(st.turno==='entrada') L.push('• '+nm+': '+p+' preparadas / prev. '+v+' vendas');
+    else                     L.push('• '+nm+': '+p+' vendidas / '+v+' de sobra');
+  }
+  L.push(''); L.push('_Enviado pelo app AlphaBri Bistrô_');
+  return L.join('\n');
+}
+
+function sendWpp()   { window.location.href='https://wa.me/'+WPP+'?text='+encodeURIComponent(rel()); }
+function sendEmail() {
+  var t=st.turno==='entrada'?'Abertura':'Fechamento';
+  var s='[AlphaBri] Checklist '+t+' - '+st.nome+' - '+hoje();
+  var b=rel().replace(/\*/g,'').replace(/_/g,'');
+  window.location.href='mailto:'+MAIL+'?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);
+}
+
+function gv(id)  { var e=document.getElementById(id); return (e&&e.value)?e.value:'—'; }
+function gvt(id) { var e=document.getElementById(id); return e?e.value.trim():''; }
+
+function hoje() {
+  var d=new Date();
+  var ds=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+  var ms=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  return ds[d.getDay()]+', '+d.getDate()+' de '+ms[d.getMonth()]+' de '+d.getFullYear();
+}
+
+function show(id) {
+  var all = document.querySelectorAll('.screen');
+  for(var i=0;i<all.length;i++) {
+    all[i].className = all[i].className.replace(/\bactive\b/g,'').trim();
+  }
+  document.getElementById(id).className += ' active';
+  var cb = document.getElementById('cbody');
+  if(cb) cb.scrollTop=0;
+}
+
+function reset() {
+  st={nome:'',turno:'',checks:[]};
+  document.getElementById('nome').value='';
+  document.getElementById('btn-e').className='turno-btn';
+  document.getElementById('btn-s').className='turno-btn';
+  document.getElementById('start-btn').disabled=true;
+  show('screen-home');
+}
+</script>
+</body>
+</html>
