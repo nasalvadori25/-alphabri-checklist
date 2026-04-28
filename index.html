@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cozinha">
+<title>AlphaBri · Checklist Cozinha</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #c9973a;
+  --gold-light: #f5e6c8;
+  --dark: #141414;
+  --dark2: #1e1e1e;
+  --dark3: #2a2a2a;
+  --green: #2d6a4f;
+  --green-light: #d8f3dc;
+  --red: #9b2226;
+  --red-light: #fde8e8;
+  --white: #fff;
+  --offwhite: #faf8f4;
+  --border: #333;
+  --text: #e8e2d8;
+  --muted: #888;
+  --radius: 14px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  background: var(--dark);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ── SCREENS ── */
+.screen { display:none; height:100vh; flex-direction:column; overflow:hidden; }
+.screen.active { display:flex; }
+
+/* ════════════════════════════
+   TELA 1 — BOAS VINDAS
+════════════════════════════ */
+#screen-home {
+  background: var(--dark);
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+#screen-home::before {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,151,58,0.12) 0%, transparent 70%);
+  top: -100px; left: -100px;
+  pointer-events: none;
+}
+
+#screen-home::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(45,106,79,0.1) 0%, transparent 70%);
+  bottom: -80px; right: -80px;
+  pointer-events: none;
+}
+
+.home-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  z-index: 1;
+  padding: 40px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  width: 80px; height: 80px;
+  background: var(--dark2);
+  border: 2px solid var(--gold);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  box-shadow: 0 8px 32px rgba(201,151,58,0.2);
+}
+
+.logo-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: -0.5px;
+}
+
+.logo-sub {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.home-greeting {
+  font-size: 16px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.name-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.name-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.name-input {
+  width: 100%;
+  background: var(--dark2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  font-size: 20px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.name-input:focus { border-color: var(--gold); }
+.name-input::placeholder { color: #555; }
+
+.turno-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.turno-btn {
+  padding: 16px;
+  background: var(--dark2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.turno-btn .turno-emoji { font-size: 24px; }
+
+.turno-btn.selected-entrada {
+  border-color: var(--green);
+  background: rgba(45,106,79,0.15);
+  color: #52b788;
+}
+
+.turno-btn.selected-saida {
+  border-color: var(--red);
+  background: rgba(155,34,38,0.15);
+  color: #e07070;
+}
+
+.start-btn {
+  width: 100%;
+  padding: 20px;
+  background: var(--gold);
+  border: none;
+  border-radius: var(--radius);
+  color: var(--dark);
+  font-size: 17px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: opacity 0.2s, transform 0.1s;
+  box-shadow: 0 4px 20px rgba(201,151,58,0.3);
+}
+
+.start-btn:active { transform: scale(0.98); opacity: 0.9; }
+.start-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* ════════════════════════════
+   TELA 2 — CHECKLIST
+════════════════════════════ */
+#screen-check {
+  background: var(--dark);
+}
+
+.check-topbar {
+  background: var(--dark2);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.check-topbar-left { display: flex; flex-direction: column; gap: 2px; }
+
+.check-topbar-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.check-topbar-sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.check-topbar-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.badge-green { background: rgba(45,106,79,0.2); color: #52b788; border: 1px solid rgba(82,183,136,0.3); }
+.badge-red   { background: rgba(155,34,38,0.2); color: #e07070; border: 1px solid rgba(224,112,112,0.3); }
+
+/* progress bar */
+.progress-bar-wrap {
+  height: 4px;
+  background: var(--dark3);
+  flex-shrink: 0;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--gold);
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+/* scroll body */
+.check-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* section */
+.check-section-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.check-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--dark3);
+}
+
+/* check item */
+.check-list { display: flex; flex-direction: column; gap: 8px; }
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--dark2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.check-row.done {
+  background: rgba(45,106,79,0.1);
+  border-color: rgba(82,183,136,0.4);
+}
+
+.check-row.done .check-label { color: var(--muted); text-decoration: line-through; }
+
+.check-circle {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  font-size: 14px;
+  color: transparent;
+}
+
+.check-row.done .check-circle {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.check-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+  transition: color 0.15s;
+}
+
+/* ── ESTOQUE TABLE ── */
+.stock-card {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.stock-card-header {
+  padding: 14px 18px;
+  background: var(--dark3);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.stock-row {
+  display: grid;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+
+.stock-row:last-child { border-bottom: none; }
+
+.stock-row-salgado { grid-template-columns: 1fr 80px 80px; }
+.stock-row-bistro  { grid-template-columns: 1fr 80px 80px; }
+
+.stock-row-header {
+  background: var(--dark);
+  padding: 8px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stock-row-header .stock-prod { font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); font-weight: 600; }
+.stock-row-header .stock-col  { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; text-align: center; }
+
+.stock-prod {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.stock-prod.italic { font-style: italic; color: var(--muted); font-size: 13px; }
+
+.stock-input {
+  background: var(--dark);
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 10px 8px;
+  font-size: 18px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--white);
+  text-align: center;
+  outline: none;
+  width: 100%;
+  -webkit-appearance: none;
+}
+
+.stock-input:focus { border-color: var(--gold); }
+
+.stock-input-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.stock-input-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #555; font-weight: 600; }
+
+.bistro-name-input {
+  background: var(--dark);
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-style: italic;
+  color: var(--text);
+  outline: none;
+  width: 100%;
+}
+
+.bistro-name-input:focus { border-color: var(--gold); }
+.bistro-name-input::placeholder { color: #444; }
+
+/* ── BOTTOM BAR ── */
+.check-bottom {
+  background: var(--dark2);
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+  flex-shrink: 0;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.progress-text span { color: var(--gold); font-weight: 600; }
+
+.send-btn {
+  width: 100%;
+  padding: 18px;
+  background: var(--gold);
+  border: none;
+  border-radius: var(--radius);
+  color: var(--dark);
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  box-shadow: 0 4px 20px rgba(201,151,58,0.3);
+}
+
+.send-btn:active { transform: scale(0.98); opacity: 0.9; }
+.send-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* ════════════════════════════
+   TELA 3 — ENVIO
+════════════════════════════ */
+#screen-send {
+  background: var(--dark);
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+}
+
+.send-card {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.send-icon { font-size: 52px; }
+
+.send-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--white);
+  text-align: center;
+}
+
+.send-sub {
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.send-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.send-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: var(--dark3);
+  color: var(--text);
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.send-action-btn:active { opacity: 0.8; transform: scale(0.98); }
+
+.send-action-btn.whatsapp { border-color: rgba(37,211,102,0.4); background: rgba(37,211,102,0.08); color: #25d366; }
+.send-action-btn.email    { border-color: rgba(201,151,58,0.4); background: rgba(201,151,58,0.08); color: var(--gold); }
+
+.send-action-icon { font-size: 24px; }
+.send-action-text { display: flex; flex-direction: column; gap: 2px; }
+.send-action-label { font-size: 15px; }
+.send-action-sub   { font-size: 11px; font-weight: 400; color: var(--muted); }
+
+.new-check-btn {
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.new-check-btn:active { background: var(--dark3); }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     TELA 1 — HOME
+══════════════════════════════ -->
+<div id="screen-home" class="screen active">
+  <div class="home-inner">
+    <div class="logo-area">
+      <div class="logo-icon">🍽️</div>
+      <div class="logo-brand">AlphaBri Bistrô</div>
+      <div class="logo-sub">Checklist da Cozinha</div>
+    </div>
+
+    <div class="home-greeting">Olá! Qual é o seu nome e o que você vai fazer?</div>
+
+    <div class="name-section">
+      <div class="name-label">Seu nome</div>
+      <input class="name-input" id="nome-input" type="text" placeholder="Ex: Maria, João..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+
+    <div class="name-section">
+      <div class="name-label">Tipo de checklist</div>
+      <div class="turno-row">
+        <button class="turno-btn" id="btn-entrada" onclick="selectTurno('entrada')">
+          <span class="turno-emoji">🌅</span>
+          <span>Abertura</span>
+          <span style="font-size:11px;color:#666">Chegando</span>
+        </button>
+        <button class="turno-btn" id="btn-saida" onclick="selectTurno('saida')">
+          <span class="turno-emoji">🌙</span>
+          <span>Fechamento</span>
+          <span style="font-size:11px;color:#666">Indo embora</span>
+        </button>
+      </div>
+    </div>
+
+    <button class="start-btn" id="start-btn" onclick="startCheck()" disabled>
+      Iniciar Checklist →
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     TELA 2 — CHECKLIST
+══════════════════════════════ -->
+<div id="screen-check" class="screen">
+
+  <div class="check-topbar">
+    <div class="check-topbar-left">
+      <div class="check-topbar-title" id="check-title">Checklist</div>
+      <div class="check-topbar-sub" id="check-sub"></div>
+    </div>
+    <div class="check-topbar-badge" id="check-badge"></div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill"></div>
+  </div>
+
+  <div class="check-body" id="check-body">
+    <!-- gerado via JS -->
+  </div>
+
+  <div class="check-bottom">
+    <div class="progress-text" id="progress-text"></div>
+    <button class="send-btn" id="send-btn" onclick="goToSend()">
+      Finalizar e Enviar Relatório
+    </button>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════
+     TELA 3 — ENVIO
+══════════════════════════════ -->
+<div id="screen-send" class="screen">
+  <div class="send-card">
+    <div class="send-icon">✅</div>
+    <div class="send-title">Checklist concluído!</div>
+    <div class="send-sub" id="send-sub-text"></div>
+    <div class="send-actions">
+      <button class="send-action-btn whatsapp" id="btn-whatsapp" onclick="sendWhatsApp()">
+        <span class="send-action-icon">💬</span>
+        <span class="send-action-text">
+          <span class="send-action-label">Enviar pelo WhatsApp</span>
+          <span class="send-action-sub">Abre o WhatsApp com o relatório</span>
+        </span>
+      </button>
+      <button class="send-action-btn email" id="btn-email" onclick="sendEmail()">
+        <span class="send-action-icon">📧</span>
+        <span class="send-action-text">
+          <span class="send-action-label">Enviar por E-mail</span>
+          <span class="send-action-sub">Abre o app de e-mail</span>
+        </span>
+      </button>
+    </div>
+    <button class="new-check-btn" onclick="resetApp()">
+      ← Fazer novo checklist
+    </button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════
+// CONFIGURAÇÃO — EDITE AQUI
+// ══════════════════════════
+var CONFIG = {
+  whatsappNumber: '5511972069172', // número AlphaBri
+  emailDestino: 'cozinha@alphabri.com.br',
+  emailCC: ''
+};
+
+// ══════════════════════════
+// DADOS DOS CHECKLISTS
+// ══════════════════════════
+var CHECKLIST = {
+  entrada: [
+    'Lavar as mãos ao entrar',
+    'Colocar uniforme e avental limpos',
+    'Prender o cabelo / colocar touca',
+    'Verificar temperatura da geladeira e freezer',
+    'Checar validade dos insumos em uso',
+    'Higienizar bancadas e superfícies',
+    'Ligar equipamentos e testar funcionamento',
+    'Organizar mise en place do dia',
+    'Repor embalagens e descartáveis',
+    'Verificar nível de gás / energia',
+    'Checar limpeza do piso e lixeiras',
+    'Confirmar cardápio do bistrô do dia'
+  ],
+  saida: [
+    'Guardar e tampar todos os alimentos',
+    'Identificar e datar produtos preparados',
+    'Lavar toda a louça e utensílios',
+    'Limpar e higienizar bancadas',
+    'Limpar fogão, forno e equipamentos',
+    'Desligar todos os equipamentos',
+    'Fechar torneiras e verificar ralos',
+    'Esvaziar e higienizar lixeiras',
+    'Varrer e passar pano no piso',
+    'Conferir geladeira e freezer fechados',
+    'Apagar as luzes da cozinha',
+    'Registrar ocorrências do dia (se houver)'
+  ]
+};
+
+var SALGADOS = ['Coxinha','Croissant','Pão de Queijo','Pastel Integral','Esfiha de Carne'];
+var BISTRO_ROWS = 4;
+
+// ══════════════════════════
+// ESTADO
+// ══════════════════════════
+var state = {
+  nome: '',
+  turno: '',
+  checks: [],
+  totalItems: 0
+};
+
+// ══════════════════════════
+// TELA HOME
+// ══════════════════════════
+document.getElementById('nome-input').addEventListener('input', validateHome);
+
+function selectTurno(t) {
+  state.turno = t;
+  document.getElementById('btn-entrada').className = 'turno-btn' + (t==='entrada' ? ' selected-entrada' : '');
+  document.getElementById('btn-saida').className   = 'turno-btn' + (t==='saida'   ? ' selected-saida'  : '');
+  validateHome();
+}
+
+function validateHome() {
+  var nome = document.getElementById('nome-input').value.trim();
+  document.getElementById('start-btn').disabled = !(nome && state.turno);
+}
+
+function startCheck() {
+  state.nome = document.getElementById('nome-input').value.trim();
+  state.checks = CHECKLIST[state.turno].map(function(){ return false; });
+  buildCheckScreen();
+  showScreen('screen-check');
+}
+
+// ══════════════════════════
+// CONSTRUIR TELA CHECKLIST
+// ══════════════════════════
+function buildCheckScreen() {
+  var t = state.turno;
+  document.getElementById('check-title').textContent = t==='entrada' ? 'Checklist de Entrada' : 'Checklist de Saída';
+  document.getElementById('check-sub').textContent   = state.nome + ' · ' + getDateStr();
+  document.getElementById('check-badge').textContent = t==='entrada' ? '🌅 Abertura' : '🌙 Fechamento';
+  document.getElementById('check-badge').className   = 'check-topbar-badge ' + (t==='entrada' ? 'badge-green' : 'badge-red');
+
+  var body = document.getElementById('check-body');
+  body.innerHTML = '';
+
+  // — Bloco estoque (entrada ou saída primeiro)
+  var stockBlock = document.createElement('div');
+
+  // título estoque
+  var stTitle = document.createElement('div');
+  stTitle.className = 'check-section-title';
+  stTitle.textContent = '📦 Contagem de Estoque';
+  stockBlock.appendChild(stTitle);
+
+  // Salgados
+  var salgadosCard = buildSalgadosCard(t);
+  stockBlock.appendChild(salgadosCard);
+
+  // Bistrô
+  var bistroCard = buildBistroCard(t);
+  stockBlock.appendChild(bistroCard);
+
+  // — Bloco checklist
+  var checkBlock = document.createElement('div');
+
+  var chTitle = document.createElement('div');
+  chTitle.className = 'check-section-title';
+  chTitle.textContent = t==='entrada' ? '✅ Rotina de Abertura' : '✅ Rotina de Fechamento';
+  checkBlock.appendChild(chTitle);
+
+  var list = document.createElement('div');
+  list.className = 'check-list';
+  list.id = 'check-list';
+
+  CHECKLIST[t].forEach(function(item, i) {
+    var row = document.createElement('div');
+    row.className = 'check-row';
+    row.id = 'check-row-' + i;
+    row.setAttribute('onclick', 'toggleCheck('+i+')');
+    row.innerHTML =
+      '<div class="check-circle" id="circle-'+i+'">✓</div>' +
+      '<div class="check-label" id="label-'+i+'">'+item+'</div>';
+    list.appendChild(row);
+  });
+
+  checkBlock.appendChild(list);
+
+  // ordem: saída mostra estoque primeiro, entrada mostra checklist primeiro
+  if (t === 'saida') {
+    body.appendChild(stockBlock);
+    body.appendChild(checkBlock);
+  } else {
+    body.appendChild(checkBlock);
+    body.appendChild(stockBlock);
+  }
+
+  state.totalItems = CHECKLIST[t].length;
+  updateProgress();
+}
+
+function buildSalgadosCard(turno) {
+  var card = document.createElement('div');
+  card.className = 'stock-card';
+  card.style.marginBottom = '12px';
+
+  var header = document.createElement('div');
+  header.className = 'stock-card-header';
+  header.textContent = 'Salgados Pissani';
+  card.appendChild(header);
+
+  // col header
+  var colRow = document.createElement('div');
+  colRow.className = 'stock-row stock-row-header stock-row-salgado';
+  colRow.innerHTML = '<div class="stock-prod">Produto</div><div class="stock-col">Sacolas<br>Fechadas</div><div class="stock-col">Unidades<br>(Emb. Aberta)</div>';
+  card.appendChild(colRow);
+
+  SALGADOS.forEach(function(s, i) {
+    var row = document.createElement('div');
+    row.className = 'stock-row stock-row-salgado';
+
+    var prodDiv = document.createElement('div');
+    prodDiv.className = 'stock-prod';
+    prodDiv.textContent = s;
+
+    var col1 = buildStockInputWrap('sacolas', turno+'-sal-sacola-'+i, '');
+    var col2 = buildStockInputWrap('unidades', turno+'-sal-unid-'+i, '');
+
+    row.appendChild(prodDiv);
+    row.appendChild(col1);
+    row.appendChild(col2);
+    card.appendChild(row);
+  });
+
+  return card;
+}
+
+function buildBistroCard(turno) {
+  var card = document.createElement('div');
+  card.className = 'stock-card';
+
+  var header = document.createElement('div');
+  header.className = 'stock-card-header';
+  header.textContent = 'Bistrô · Porções';
+  card.appendChild(header);
+
+  // col header
+  var colRow = document.createElement('div');
+  colRow.className = 'stock-row stock-row-header stock-row-bistro';
+  if (turno === 'entrada') {
+    colRow.innerHTML = '<div class="stock-prod">Prato do Dia</div><div class="stock-col">Porções<br>Preparadas</div><div class="stock-col">Prev.<br>Vendas</div>';
+  } else {
+    colRow.innerHTML = '<div class="stock-prod">Prato do Dia</div><div class="stock-col">Vendidas</div><div class="stock-col">Sobra</div>';
+  }
+  card.appendChild(colRow);
+
+  for (var i = 0; i < BISTRO_ROWS; i++) {
+    var row = document.createElement('div');
+    row.className = 'stock-row stock-row-bistro';
+
+    var nameInput = document.createElement('input');
+    nameInput.className = 'bistro-name-input';
+    nameInput.type = 'text';
+    nameInput.placeholder = 'Nome do prato…';
+    nameInput.id = turno+'-bistro-nome-'+i;
+    nameInput.autocomplete = 'off';
+
+    var col1, col2;
+    if (turno === 'entrada') {
+      col1 = buildStockInputWrap('preparo', turno+'-bistro-prep-'+i, '');
+      col2 = buildStockInputWrap('prev.', turno+'-bistro-prev-'+i, '');
+    } else {
+      col1 = buildStockInputWrap('vendidas', turno+'-bistro-vend-'+i, '');
+      col2 = buildStockInputWrap('sobra', turno+'-bistro-sobra-'+i, '');
+    }
+
+    row.appendChild(nameInput);
+    row.appendChild(col1);
+    row.appendChild(col2);
+    card.appendChild(row);
+  }
+
+  return card;
+}
+
+function buildStockInputWrap(label, id, placeholder) {
+  var wrap = document.createElement('div');
+  wrap.className = 'stock-input-wrap';
+  var lbl = document.createElement('div');
+  lbl.className = 'stock-input-label';
+  lbl.textContent = label;
+  var inp = document.createElement('input');
+  inp.className = 'stock-input';
+  inp.type = 'number';
+  inp.inputMode = 'numeric';
+  inp.pattern = '[0-9]*';
+  inp.min = '0';
+  inp.id = id;
+  inp.placeholder = '0';
+  wrap.appendChild(lbl);
+  wrap.appendChild(inp);
+  return wrap;
+}
+
+// ══════════════════════════
+// TOGGLE CHECK
+// ══════════════════════════
+function toggleCheck(i) {
+  state.checks[i] = !state.checks[i];
+  var row    = document.getElementById('check-row-'+i);
+  var circle = document.getElementById('circle-'+i);
+  if (state.checks[i]) {
+    row.classList.add('done');
+    circle.textContent = '✓';
+  } else {
+    row.classList.remove('done');
+    circle.textContent = '';
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  var done  = state.checks.filter(Boolean).length;
+  var total = state.totalItems;
+  var pct   = total ? Math.round(done/total*100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').innerHTML =
+    '<span>'+done+'/'+total+'</span> itens do checklist marcados';
+}
+
+// ══════════════════════════
+// IR PARA ENVIO
+// ══════════════════════════
+function goToSend() {
+  var done  = state.checks.filter(Boolean).length;
+  var total = state.totalItems;
+  var t = state.turno === 'entrada' ? 'Abertura' : 'Fechamento';
+  document.getElementById('send-sub-text').textContent =
+    state.nome + ' · ' + t + ' · ' + getDateStr() + '\n' + done + ' de ' + total + ' itens concluídos.';
+  showScreen('screen-send');
+}
+
+// ══════════════════════════
+// GERAR RELATÓRIO
+// ══════════════════════════
+function buildReport() {
+  var t     = state.turno === 'entrada' ? 'ABERTURA' : 'FECHAMENTO';
+  var emoji = state.turno === 'entrada' ? '🌅' : '🌙';
+  var lines = [];
+
+  lines.push(emoji + ' *CHECKLIST DE ' + t + ' — AlphaBri Bistrô*');
+  lines.push('📅 ' + getDateStr());
+  lines.push('👤 ' + state.nome);
+  lines.push('');
+
+  // checklist
+  lines.push('*✅ ROTINA DE ' + t + '*');
+  CHECKLIST[state.turno].forEach(function(item, i) {
+    lines.push((state.checks[i] ? '✅' : '⬜') + ' ' + item);
+  });
+
+  var done  = state.checks.filter(Boolean).length;
+  var total = state.totalItems;
+  lines.push('');
+  lines.push('Concluído: ' + done + '/' + total + ' itens');
+  lines.push('');
+
+  // salgados
+  lines.push('*📦 SALGADOS*');
+  SALGADOS.forEach(function(s, i) {
+    var sacId   = state.turno+'-sal-sacola-'+i;
+    var unidId  = state.turno+'-sal-unid-'+i;
+    var sac     = getVal(sacId);
+    var uni     = getVal(unidId);
+    lines.push('• ' + s + ': ' + sac + ' sacolas / ' + uni + ' unids abertas');
+  });
+  lines.push('');
+
+  // bistrô
+  lines.push('*🍝 BISTRÔ — PORÇÕES*');
+  for (var i = 0; i < BISTRO_ROWS; i++) {
+    var nome = getValText(state.turno+'-bistro-nome-'+i);
+    if (!nome) continue;
+    if (state.turno === 'entrada') {
+      var prep = getVal(state.turno+'-bistro-prep-'+i);
+      var prev = getVal(state.turno+'-bistro-prev-'+i);
+      lines.push('• ' + nome + ': ' + prep + ' preparadas / prev. ' + prev + ' vendas');
+    } else {
+      var vend  = getVal(state.turno+'-bistro-vend-'+i);
+      var sobra = getVal(state.turno+'-bistro-sobra-'+i);
+      lines.push('• ' + nome + ': ' + vend + ' vendidas / ' + sobra + ' de sobra');
+    }
+  }
+
+  lines.push('');
+  lines.push('_Enviado pelo app de checklist AlphaBri_');
+
+  return lines.join('\n');
+}
+
+function getVal(id) {
+  var el = document.getElementById(id);
+  return el ? (el.value || '—') : '—';
+}
+
+function getValText(id) {
+  var el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+// ══════════════════════════
+// ENVIO
+// ══════════════════════════
+function sendWhatsApp() {
+  var msg = buildReport();
+  var url = 'https://wa.me/' + CONFIG.whatsappNumber + '?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+}
+
+function sendEmail() {
+  var t     = state.turno === 'entrada' ? 'Abertura' : 'Fechamento';
+  var subj  = '[AlphaBri] Checklist ' + t + ' — ' + state.nome + ' — ' + getDateStr();
+  var body  = buildReport().replace(/\*/g,'').replace(/_/g,'');
+  var url   = 'mailto:' + CONFIG.emailDestino;
+  if (CONFIG.emailCC) url += '?cc=' + CONFIG.emailCC + '&subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+  else url += '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+  window.location.href = url;
+}
+
+// ══════════════════════════
+// UTILIDADES
+// ══════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  // scroll para o topo ao trocar de tela
+  var body = document.getElementById('check-body');
+  if (body) body.scrollTop = 0;
+}
+
+function getDateStr() {
+  var d = new Date();
+  return d.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+}
+
+function resetApp() {
+  state = { nome:'', turno:'', checks:[], totalItems:0 };
+  document.getElementById('nome-input').value = '';
+  document.getElementById('btn-entrada').className = 'turno-btn';
+  document.getElementById('btn-saida').className   = 'turno-btn';
+  document.getElementById('start-btn').disabled = true;
+  showScreen('screen-home');
+}
+</script>
+</body>
+</html>
