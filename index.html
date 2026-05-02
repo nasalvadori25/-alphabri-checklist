@@ -206,13 +206,9 @@ html, body { width:100%; height:100%; background:#141414; font-family:-apple-sys
     <div class="si-icon">✅</div>
     <div class="si-title">Checklist concluído!</div>
     <div class="si-sub" id="ssub"></div>
-    <button class="act-btn wpp" onclick="sendWpp()">
-      <span class="ae">💬</span>
-      <span class="ai"><span class="al">Enviar pelo WhatsApp</span><span class="as">Abre o WhatsApp com o relatório</span></span>
-    </button>
-    <button class="act-btn eml" onclick="sendEmail()">
-      <span class="ae">📧</span>
-      <span class="ai"><span class="al">Enviar por E-mail</span><span class="as">Abre o app de e-mail</span></span>
+    <button class="act-btn wpp" onclick="sendTelegram()">
+      <span class="ae">✈️</span>
+      <span class="ai"><span class="al">Enviar pelo Telegram</span><span class="as">Você recebe a notificação na hora</span></span>
     </button>
     <button class="new-btn" onclick="reset()">← Fazer novo checklist</button>
   </div>
@@ -220,6 +216,8 @@ html, body { width:100%; height:100%; background:#141414; font-family:-apple-sys
 
 <script>
 var WPP  = '5511972069172';
+var TG_TOKEN = '8670038712:AAHAWaWJNu-EoHHSzASdzll8g5xO7WG13VM';
+var TG_CHAT  = '8513696914';
 var MAIL = 'cozinha@alphabri.com.br';
 
 var DADOS = {
@@ -508,12 +506,21 @@ function rel() {
   return L.join('\n');
 }
 
-function sendWpp()   { window.location.href='https://wa.me/'+WPP+'?text='+encodeURIComponent(rel()); }
+function sendWpp()   { window.open('https://wa.me/'+WPP+'?text='+encodeURIComponent(rel()), '_blank'); }
+
+function sendTelegram() {
+  var msg = rel();
+  var url = 'https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage?chat_id=' + TG_CHAT + '&text=' + encodeURIComponent(msg);
+  var img = new Image();
+  img.onload  = function(){ alert('Relatório enviado!'); };
+  img.onerror = function(){ alert('Relatório enviado!'); };
+  img.src = url;
+}
 function sendEmail() {
   var t=st.turno==='entrada'?'Abertura':'Fechamento'; var cat=st.cat==='cozinha'?'Cozinha':'Salão';
   var s='[AlphaBri] '+cat+' '+t+' - '+st.nome+' - '+hoje();
   var b=rel().replace(/\*/g,'').replace(/_/g,'');
-  window.location.href='mailto:'+MAIL+'?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b);
+  window.open('mailto:'+MAIL+'?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b), '_blank');
 }
 
 function gv(id)  { var e=document.getElementById(id); return(e&&e.value)?e.value:'—'; }
