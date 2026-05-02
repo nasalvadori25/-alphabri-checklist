@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AlphaBri">
+<title>AlphaBri · Checklist</title>
+<style>
+* { margin:0; padding:0; -webkit-box-sizing:border-box; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { width:100%; height:100%; background:#141414; font-family:-apple-system,Helvetica,Arial,sans-serif; color:#e8e2d8; overflow:hidden; }
+
+.screen { display:none; position:absolute; top:0; left:0; width:100%; height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.screen.active { display:block; }
+
+/* TELA 1 - CATEGORIA */
+#s-cat { display:none; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; -webkit-box-pack:center; -webkit-justify-content:center; justify-content:center; -webkit-box-align:center; -webkit-align-items:center; align-items:center; }
+#s-cat.active { display:-webkit-box; display:-webkit-flex; display:flex; }
+
+.cat-inner { padding:40px 32px; width:100%; max-width:500px; display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; -webkit-box-align:center; -webkit-align-items:center; align-items:center; gap:32px; }
+.logo-icon  { font-size:56px; text-align:center; }
+.logo-brand { font-size:30px; font-weight:700; color:#fff; text-align:center; letter-spacing:-0.5px; }
+.logo-sub   { font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:#c9973a; font-weight:600; text-align:center; margin-top:4px; }
+.cat-prompt { font-size:17px; color:#888; text-align:center; line-height:1.5; }
+
+.cat-cards { display:-webkit-box; display:-webkit-flex; display:flex; gap:16px; width:100%; }
+.cat-card { -webkit-box-flex:1; -webkit-flex:1; flex:1; padding:28px 16px; background:#1e1e1e; border:2px solid #2a2a2a; -webkit-border-radius:18px; border-radius:18px; cursor:pointer; text-align:center; -webkit-appearance:none; font-family:-apple-system,Helvetica,Arial,sans-serif; display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; -webkit-box-align:center; -webkit-align-items:center; align-items:center; gap:10px; }
+.cat-card:active { opacity:0.8; }
+.cat-card.cozinha { border-color:#c9973a; background:rgba(201,151,58,0.08); }
+.cat-card.salao   { border-color:#4a90c4; background:rgba(74,144,196,0.08); }
+.cat-emoji { font-size:40px; }
+.cat-name  { font-size:18px; font-weight:700; color:#fff; }
+.cat-desc  { font-size:11px; color:#666; line-height:1.4; }
+
+/* TELA 2 - INFO */
+#s-info { display:none; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; -webkit-box-pack:center; -webkit-justify-content:center; justify-content:center; -webkit-box-align:center; -webkit-align-items:center; align-items:center; }
+#s-info.active { display:-webkit-box; display:-webkit-flex; display:flex; }
+
+.info-inner { padding:40px 32px; width:100%; max-width:500px; display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; -webkit-box-align:center; -webkit-align-items:center; align-items:center; gap:24px; }
+.back-btn { -webkit-align-self:flex-start; align-self:flex-start; background:transparent; border:none; color:#666; font-size:14px; font-family:-apple-system,Helvetica,Arial,sans-serif; cursor:pointer; padding:0; }
+.info-header { text-align:center; display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; -webkit-box-align:center; -webkit-align-items:center; align-items:center; gap:6px; }
+.info-cat-badge { display:inline-block; padding:6px 16px; -webkit-border-radius:20px; border-radius:20px; font-size:12px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; }
+.badge-cozinha { background:rgba(201,151,58,0.15); color:#c9973a; border:1px solid rgba(201,151,58,0.3); }
+.badge-salao   { background:rgba(74,144,196,0.15); color:#4a90c4; border:1px solid rgba(74,144,196,0.3); }
+.info-title { font-size:24px; font-weight:700; color:#fff; }
+.info-sub   { font-size:14px; color:#888; }
+
+.field-block { width:100%; }
+.field-label { font-size:11px; text-transform:uppercase; letter-spacing:0.25em; color:#888; font-weight:600; margin-bottom:10px; display:block; }
+.name-input { width:100%; background:#1e1e1e; border:1.5px solid #333; -webkit-border-radius:14px; border-radius:14px; padding:18px 20px; font-size:20px; font-family:-apple-system,Helvetica,Arial,sans-serif; color:#fff; outline:none; -webkit-appearance:none; }
+.name-input:focus { border-color:#c9973a; }
+
+.turno-row { display:-webkit-box; display:-webkit-flex; display:flex; gap:12px; width:100%; }
+.turno-btn { -webkit-box-flex:1; -webkit-flex:1; flex:1; padding:18px 12px; background:#1e1e1e; border:1.5px solid #333; -webkit-border-radius:14px; border-radius:14px; color:#888; font-size:15px; font-family:-apple-system,Helvetica,Arial,sans-serif; font-weight:500; cursor:pointer; text-align:center; -webkit-appearance:none; }
+.turno-btn .em  { font-size:26px; display:block; margin-bottom:6px; }
+.turno-btn .sub { font-size:11px; color:#555; display:block; margin-top:4px; }
+.turno-btn.sel-e { border-color:#2d6a4f; background:rgba(45,106,79,0.15); color:#52b788; }
+.turno-btn.sel-s { border-color:#9b2226; background:rgba(155,34,38,0.15); color:#e07070; }
+.turno-btn.disabled-turno { opacity:0.3; cursor:default; }
+
+.start-btn { width:100%; padding:20px; background:#c9973a; border:none; -webkit-border-radius:14px; border-radius:14px; color:#141414; font-size:17px; font-family:-apple-system,Helvetica,Arial,sans-serif; font-weight:700; cursor:pointer; -webkit-appearance:none; }
+.start-btn:disabled { opacity:0.3; }
+
+/* TELA 3 - CHECKLIST */
+#s-check { display:none; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; }
+#s-check.active { display:-webkit-box; display:-webkit-flex; display:flex; }
+
+.topbar { background:#1e1e1e; padding:14px 20px; border-bottom:1px solid #2a2a2a; -webkit-flex-shrink:0; flex-shrink:0; display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-pack:justify; -webkit-justify-content:space-between; justify-content:space-between; -webkit-box-align:center; -webkit-align-items:center; align-items:center; }
+.t-title { font-size:17px; font-weight:700; color:#fff; }
+.t-sub   { font-size:11px; color:#888; margin-top:2px; }
+.tbadge  { padding:5px 12px; -webkit-border-radius:20px; border-radius:20px; font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; }
+.tbg { background:rgba(45,106,79,0.2); color:#52b788; border:1px solid rgba(82,183,136,0.3); }
+.tbr { background:rgba(155,34,38,0.2); color:#e07070; border:1px solid rgba(224,112,112,0.3); }
+
+.prog-bar  { height:4px; background:#2a2a2a; -webkit-flex-shrink:0; flex-shrink:0; }
+.prog-fill { height:100%; background:#c9973a; width:0%; -webkit-transition:width 0.3s; transition:width 0.3s; }
+
+.check-body { -webkit-box-flex:1; -webkit-flex:1; flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:16px 20px; }
+
+.group-hdr { font-size:10px; text-transform:uppercase; letter-spacing:0.25em; color:#c9973a; font-weight:600; margin-top:16px; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #2a2a2a; }
+.group-hdr:first-child { margin-top:0; }
+
+.check-row { display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-align:center; -webkit-align-items:center; align-items:center; gap:12px; padding:13px 14px; background:#1e1e1e; border:1.5px solid #2a2a2a; -webkit-border-radius:12px; border-radius:12px; cursor:pointer; margin-bottom:7px; -webkit-user-select:none; user-select:none; }
+.check-row.done { background:rgba(45,106,79,0.1); border-color:rgba(82,183,136,0.4); }
+.check-row.done .clbl { color:#555; text-decoration:line-through; }
+.check-row.done .csub { color:#444; }
+
+.ccirc { width:26px; height:26px; -webkit-border-radius:50%; border-radius:50%; border:2px solid #444; display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-align:center; -webkit-align-items:center; align-items:center; -webkit-box-pack:center; -webkit-justify-content:center; justify-content:center; -webkit-flex-shrink:0; flex-shrink:0; font-size:13px; color:transparent; }
+.check-row.done .ccirc { background:#2d6a4f; border-color:#2d6a4f; color:#fff; }
+.ctxt { display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; gap:1px; }
+.clbl { font-size:14px; font-weight:500; color:#e8e2d8; line-height:1.3; }
+.csub { font-size:11px; color:#666; }
+
+/* STOCK */
+.stock-card { background:#1e1e1e; border:1px solid #2a2a2a; -webkit-border-radius:12px; border-radius:12px; overflow:hidden; margin-bottom:10px; }
+.stock-hdr  { padding:10px 14px; background:#222; font-size:10px; text-transform:uppercase; letter-spacing:0.2em; color:#c9973a; font-weight:600; }
+.col-hdr    { display:-webkit-box; display:-webkit-flex; display:flex; padding:6px 14px; background:#1a1a1a; border-bottom:1px solid #2a2a2a; }
+.col-hdr .cp { -webkit-box-flex:1; flex:1; font-size:8px; text-transform:uppercase; letter-spacing:0.1em; color:#555; font-weight:600; }
+.col-hdr .cc { width:72px; font-size:8px; text-transform:uppercase; letter-spacing:0.08em; color:#555; font-weight:600; text-align:center; }
+.st-row { display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-align:center; -webkit-align-items:center; align-items:center; padding:9px 14px; border-bottom:1px solid #222; gap:6px; }
+.st-row:last-child { border-bottom:none; }
+.st-prod { -webkit-box-flex:1; flex:1; font-size:13px; font-weight:500; color:#e8e2d8; }
+.iw { width:72px; display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; -webkit-box-align:center; -webkit-align-items:center; align-items:center; gap:2px; }
+.il { font-size:7px; text-transform:uppercase; letter-spacing:0.08em; color:#555; font-weight:600; }
+.si { width:100%; background:#141414; border:1px solid #333; -webkit-border-radius:7px; border-radius:7px; padding:7px 4px; font-size:16px; font-family:-apple-system,Helvetica,Arial,sans-serif; color:#fff; text-align:center; outline:none; -webkit-appearance:none; }
+.si:focus { border-color:#c9973a; }
+.bn { -webkit-box-flex:1; flex:1; background:#141414; border:1px solid #333; -webkit-border-radius:7px; border-radius:7px; padding:9px; font-size:13px; font-style:italic; font-family:-apple-system,Helvetica,Arial,sans-serif; color:#e8e2d8; outline:none; -webkit-appearance:none; }
+.bn:focus { border-color:#c9973a; }
+.bn::-webkit-input-placeholder { color:#333; }
+
+/* BOTTOM */
+.check-bot { background:#1e1e1e; border-top:1px solid #2a2a2a; padding:12px 20px; -webkit-flex-shrink:0; flex-shrink:0; }
+.prog-txt  { font-size:12px; color:#888; text-align:center; margin-bottom:10px; }
+.prog-txt span { color:#c9973a; font-weight:600; }
+.send-btn  { width:100%; padding:17px; background:#c9973a; border:none; -webkit-border-radius:14px; border-radius:14px; color:#141414; font-size:16px; font-family:-apple-system,Helvetica,Arial,sans-serif; font-weight:700; cursor:pointer; }
+
+/* TELA 4 - ENVIO */
+#s-send { display:none; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; -webkit-box-pack:center; -webkit-justify-content:center; justify-content:center; -webkit-box-align:center; -webkit-align-items:center; align-items:center; padding:32px; }
+#s-send.active { display:-webkit-box; display:-webkit-flex; display:flex; }
+.send-card { background:#1e1e1e; border:1px solid #333; -webkit-border-radius:20px; border-radius:20px; padding:32px 28px; width:100%; max-width:480px; }
+.si-icon  { font-size:48px; text-align:center; margin-bottom:14px; }
+.si-title { font-size:22px; font-weight:700; color:#fff; text-align:center; margin-bottom:6px; }
+.si-sub   { font-size:13px; color:#888; text-align:center; line-height:1.6; margin-bottom:22px; }
+.act-btn  { display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-align:center; -webkit-align-items:center; align-items:center; gap:14px; width:100%; padding:16px 18px; -webkit-border-radius:14px; border-radius:14px; border:1.5px solid #333; background:#2a2a2a; color:#e8e2d8; font-size:15px; font-family:-apple-system,Helvetica,Arial,sans-serif; font-weight:600; cursor:pointer; text-align:left; margin-bottom:10px; -webkit-appearance:none; }
+.act-btn.wpp { border-color:rgba(37,211,102,0.4); background:rgba(37,211,102,0.08); color:#25d366; }
+.act-btn.eml { border-color:rgba(201,151,58,0.4); background:rgba(201,151,58,0.08); color:#c9973a; }
+.ae { font-size:24px; }
+.ai { display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-orient:vertical; -webkit-flex-direction:column; flex-direction:column; gap:2px; }
+.al { font-size:14px; }
+.as { font-size:11px; font-weight:400; color:#666; }
+.new-btn { width:100%; padding:14px; background:transparent; border:1.5px solid #333; -webkit-border-radius:14px; border-radius:14px; color:#666; font-size:14px; font-family:-apple-system,Helvetica,Arial,sans-serif; cursor:pointer; margin-top:4px; }
+</style>
+</head>
+<body>
+
+<!-- TELA 1: CATEGORIA -->
+<div id="s-cat" class="screen active">
+  <div class="cat-inner">
+    <div>
+      <div class="logo-icon">🍽️</div>
+      <div class="logo-brand">AlphaBri Bistrô</div>
+      <div class="logo-sub">Checklist Diário</div>
+    </div>
+    <div class="cat-prompt">Onde você está trabalhando hoje?</div>
+    <div class="cat-cards">
+      <button class="cat-card cozinha" onclick="selCat('cozinha')">
+        <span class="cat-emoji">👨‍🍳</span>
+        <span class="cat-name">Cozinha</span>
+        <span class="cat-desc">Abertura e fechamento da cozinha</span>
+      </button>
+      <button class="cat-card salao" onclick="selCat('salao')">
+        <span class="cat-emoji">🪑</span>
+        <span class="cat-name">Salão</span>
+        <span class="cat-desc">Abertura e fechamento do salão</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TELA 2: NOME + TURNO -->
+<div id="s-info" class="screen">
+  <div class="info-inner">
+    <button class="back-btn" onclick="show('s-cat')">← Voltar</button>
+    <div class="info-header">
+      <span class="info-cat-badge" id="cat-badge"></span>
+      <div class="info-title">Olá! Qual é o seu nome?</div>
+      <div class="info-sub">E o que você vai fazer?</div>
+    </div>
+    <div class="field-block">
+      <span class="field-label">Seu nome</span>
+      <input class="name-input" id="nome" type="text" placeholder="Ex: Maria, João..." autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="field-block">
+      <span class="field-label">Tipo de checklist</span>
+      <div class="turno-row">
+        <button class="turno-btn" id="btn-e" onclick="selT('entrada')">
+          <span class="em">🌅</span>Abertura<span class="sub">Chegando</span>
+        </button>
+        <button class="turno-btn" id="btn-s" onclick="selT('saida')">
+          <span class="em">🌙</span>Fechamento<span class="sub">Indo embora</span>
+        </button>
+      </div>
+    </div>
+    <button class="start-btn" id="start-btn" onclick="startCheck()" disabled>Iniciar Checklist →</button>
+  </div>
+</div>
+
+<!-- TELA 3: CHECKLIST -->
+<div id="s-check" class="screen">
+  <div class="topbar">
+    <div><div class="t-title" id="ct"></div><div class="t-sub" id="cs"></div></div>
+    <div class="tbadge" id="cb"></div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="pf"></div></div>
+  <div class="check-body" id="cbody"></div>
+  <div class="check-bot">
+    <div class="prog-txt" id="pt"></div>
+    <button class="send-btn" onclick="goSend()">Finalizar e Enviar Relatório</button>
+  </div>
+</div>
+
+<!-- TELA 4: ENVIO -->
+<div id="s-send" class="screen">
+  <div class="send-card">
+    <div class="si-icon">✅</div>
+    <div class="si-title">Checklist concluído!</div>
+    <div class="si-sub" id="ssub"></div>
+    <button class="act-btn wpp" onclick="sendTelegram()">
+      <span class="ae">✈️</span>
+      <span class="ai"><span class="al">Enviar pelo Telegram</span><span class="as">Você recebe a notificação na hora</span></span>
+    </button>
+    <button class="new-btn" onclick="reset()">← Fazer novo checklist</button>
+  </div>
+</div>
+
+<script>
+var WPP  = '5511972069172';
+var TG_TOKEN = '8670038712:AAHAWaWJNu-EoHHSzASdzll8g5xO7WG13VM';
+var TG_CHAT  = '8513696914';
+var MAIL = 'cozinha@alphabri.com.br';
+
+var DADOS = {
+  cozinha: {
+    entrada: {
+      grupos: [
+        { nome: '✅ Rotina de Abertura', items: [
+          {t:'Lavar as mãos ao entrar'},
+          {t:'Colocar uniforme e avental limpos'},
+          {t:'Prender o cabelo / colocar touca'},
+          {t:'Verificar temperatura da geladeira e freezer'},
+          {t:'Checar validade dos insumos em uso'},
+          {t:'Higienizar bancadas e superfícies'},
+          {t:'Ligar equipamentos e testar funcionamento'},
+          {t:'Organizar mise en place do dia'},
+          {t:'Repor embalagens e descartáveis'},
+          {t:'Verificar nível de gás / energia'},
+          {t:'Checar limpeza do piso e lixeiras'},
+          {t:'Confirmar cardápio do bistrô do dia'}
+        ]}
+      ],
+      estoque: true
+    },
+    saida: {
+      grupos: [
+        { nome: '✅ Rotina de Fechamento', items: [
+          {t:'Guardar e tampar todos os alimentos'},
+          {t:'Identificar e datar produtos preparados'},
+          {t:'Lavar toda a louça e utensílios'},
+          {t:'Limpar e higienizar bancadas'},
+          {t:'Limpar fogão, forno e equipamentos'},
+          {t:'Desligar todos os equipamentos'},
+          {t:'Fechar torneiras e verificar ralos'},
+          {t:'Esvaziar e higienizar lixeiras'},
+          {t:'Varrer e passar pano no piso'},
+          {t:'Conferir geladeira e freezer fechados'},
+          {t:'Apagar as luzes da cozinha'},
+          {t:'Registrar ocorrências do dia (se houver)'}
+        ]}
+      ],
+      estoque: true
+    }
+  },
+  salao: {
+    entrada: {
+      grupos: [
+        { nome: '💡 Iluminação', items: [
+          {t:'Acender luz do armário'},
+          {t:'Acender luz das taças'},
+          {t:'Acender luz das massas artesanais', s:'balcão'},
+          {t:'Acender luz do café'}
+        ]},
+        { nome: '❄️ Climatização & Equipamentos', items: [
+          {t:'Ligar a TV'},
+          {t:'Ligar o rádio'},
+          {t:'Ligar o iPad'},
+          {t:'Ligar o ar-condicionado'},
+          {t:'Ligar a parede de ar'},
+          {t:'Ligar o gelo'}
+        ]},
+        { nome: '🪑 Salão & Mesas', items: [
+          {t:'Abrir o bistrô', s:'colocar mesas para fora'},
+          {t:'Verificar se as mesas estão bambas'},
+          {t:'Limpar vidro do freezer', s:'desembaçar e limpar marcas de dedo'},
+          {t:'Passar pano na loja'}
+        ]},
+        { nome: '💳 Caixa & Delivery', items: [
+          {t:'Abrir o caixa'},
+          {t:'Verificar iFood online'},
+          {t:'Verificar 99 online'},
+          {t:'Descer os doces'},
+          {t:'Buscar degustações do dia'},
+          {t:'Colocar o cardápio do dia no tablet'}
+        ]},
+        { nome: '🧹 Limpeza & Organização', items: [
+          {t:'Verificar banheiro em ordem'},
+          {t:'Verificar lixos com sacolas'}
+        ]},
+        { nome: '🖊️ Lousa', items: [
+          {t:'Escrever o cardápio do dia na lousa'}
+        ]}
+      ],
+      estoque: false
+    },
+    saida: null
+  }
+};
+
+var SALS = ['Coxinha','Croissant','Pão de Queijo','Pastel Integral','Esfiha de Carne'];
+var st   = {cat:'', turno:'', nome:'', checks:[], total:0};
+
+function selCat(c) {
+  st.cat = c;
+  var badge = document.getElementById('cat-badge');
+  badge.textContent = c==='cozinha' ? '👨‍🍳 Cozinha' : '🪑 Salão';
+  badge.className   = 'info-cat-badge ' + (c==='cozinha' ? 'badge-cozinha' : 'badge-salao');
+  st.turno = ''; st.nome = '';
+  document.getElementById('nome').value = '';
+  document.getElementById('btn-e').className = 'turno-btn';
+  document.getElementById('start-btn').disabled = true;
+  var btnS = document.getElementById('btn-s');
+  if (c === 'salao') {
+    btnS.className = 'turno-btn disabled-turno';
+    btnS.onclick = function(){ return false; };
+  } else {
+    btnS.className = 'turno-btn';
+    btnS.onclick = function(){ selT('saida'); };
+  }
+  show('s-info');
+}
+
+document.getElementById('nome').addEventListener('input', function(){ valInfo(); });
+
+function selT(t) {
+  if (st.cat==='salao' && t==='saida') return;
+  st.turno = t;
+  document.getElementById('btn-e').className = 'turno-btn'+(t==='entrada' ? ' sel-e' : '');
+  var btnS = document.getElementById('btn-s');
+  if (st.cat !== 'salao') btnS.className = 'turno-btn'+(t==='saida' ? ' sel-s' : '');
+  valInfo();
+}
+
+function valInfo() {
+  var ok = document.getElementById('nome').value.trim() !== '' && st.turno !== '';
+  document.getElementById('start-btn').disabled = !ok;
+}
+
+function startCheck() {
+  st.nome = document.getElementById('nome').value.trim();
+  st.checks = []; st.total = 0;
+  var grupos = DADOS[st.cat][st.turno].grupos;
+  for (var g=0; g<grupos.length; g++) {
+    for (var i=0; i<grupos[g].items.length; i++) { st.checks.push(false); st.total++; }
+  }
+  buildCheck();
+  show('s-check');
+}
+
+function buildCheck() {
+  var config = DADOS[st.cat][st.turno];
+  var t = st.turno;
+  document.getElementById('ct').textContent = t==='entrada' ? 'Checklist de Abertura' : 'Checklist de Fechamento';
+  document.getElementById('cs').textContent = st.nome+' · '+(st.cat==='cozinha'?'Cozinha':'Salão')+' · '+hoje();
+  document.getElementById('cb').textContent = t==='entrada' ? '🌅 Abertura' : '🌙 Fechamento';
+  document.getElementById('cb').className   = 'tbadge '+(t==='entrada' ? 'tbg' : 'tbr');
+
+  var body = document.getElementById('cbody');
+  body.innerHTML = '';
+
+  var stockBlock = config.estoque ? mkStock(t) : null;
+  var checkBlock = document.createElement('div');
+  var checkIdx   = 0;
+
+  var grupos = config.grupos;
+  for (var g=0; g<grupos.length; g++) {
+    var gr = grupos[g];
+    var ghdr = document.createElement('div');
+    ghdr.className = 'group-hdr';
+    ghdr.textContent = gr.nome;
+    checkBlock.appendChild(ghdr);
+
+    for (var i=0; i<gr.items.length; i++) {
+      (function(idx, item){
+        var row = document.createElement('div');
+        row.className = 'check-row'; row.id = 'r'+idx;
+        var circ = document.createElement('div');
+        circ.className = 'ccirc'; circ.id = 'c'+idx; circ.textContent = '';
+        var ctxt = document.createElement('div'); ctxt.className = 'ctxt';
+        var lbl = document.createElement('div'); lbl.className = 'clbl'; lbl.textContent = item.t;
+        ctxt.appendChild(lbl);
+        if (item.s) { var sub = document.createElement('div'); sub.className = 'csub'; sub.textContent = item.s; ctxt.appendChild(sub); }
+        row.appendChild(circ); row.appendChild(ctxt);
+        row.onclick = function(){ tog(idx); };
+        checkBlock.appendChild(row);
+      })(checkIdx, gr.items[i]);
+      checkIdx++;
+    }
+  }
+
+  if (stockBlock) {
+    if (t==='saida') { body.appendChild(stockBlock); body.appendChild(checkBlock); }
+    else             { body.appendChild(checkBlock); body.appendChild(stockBlock); }
+  } else {
+    body.appendChild(checkBlock);
+  }
+  prog();
+}
+
+function mkStock(t) {
+  var d = document.createElement('div');
+  var tl = document.createElement('div'); tl.className='group-hdr'; tl.textContent='📦 Contagem de Estoque';
+  d.appendChild(tl);
+
+  var c1 = document.createElement('div'); c1.className='stock-card';
+  var h1 = document.createElement('div'); h1.className='stock-hdr'; h1.textContent='Salgados Pissani';
+  c1.appendChild(h1);
+  var ch = document.createElement('div'); ch.className='col-hdr';
+  ch.innerHTML='<div class="cp">Produto</div><div class="cc">Sacolas</div><div class="cc">Unids</div>';
+  c1.appendChild(ch);
+  for (var i=0; i<SALS.length; i++) {
+    var row=document.createElement('div'); row.className='st-row';
+    var p=document.createElement('div'); p.className='st-prod'; p.textContent=SALS[i];
+    row.appendChild(p); row.appendChild(mkIW('sacolas',t+'ss'+i)); row.appendChild(mkIW('unids',t+'su'+i));
+    c1.appendChild(row);
+  }
+  d.appendChild(c1);
+
+  var c2=document.createElement('div'); c2.className='stock-card';
+  var h2=document.createElement('div'); h2.className='stock-hdr'; h2.textContent='Bistrô · Porções';
+  c2.appendChild(h2);
+  var ch2=document.createElement('div'); ch2.className='col-hdr';
+  ch2.innerHTML = t==='entrada'
+    ? '<div class="cp">Prato</div><div class="cc">Preparo</div><div class="cc">Prev.</div>'
+    : '<div class="cp">Prato</div><div class="cc">Vendidas</div><div class="cc">Sobra</div>';
+  c2.appendChild(ch2);
+  for (var j=0; j<4; j++) {
+    var br=document.createElement('div'); br.className='st-row';
+    var bn=document.createElement('input'); bn.className='bn'; bn.type='text'; bn.placeholder='Nome do prato…'; bn.id=t+'bn'+j; bn.autocomplete='off';
+    br.appendChild(bn);
+    br.appendChild(mkIW(t==='entrada'?'preparo':'vendidas', t+'bp'+j));
+    br.appendChild(mkIW(t==='entrada'?'prev.':'sobra', t+'bv'+j));
+    c2.appendChild(br);
+  }
+  d.appendChild(c2);
+  return d;
+}
+
+function mkIW(lbl,id) {
+  var w=document.createElement('div'); w.className='iw';
+  var l=document.createElement('div'); l.className='il'; l.textContent=lbl;
+  var inp=document.createElement('input'); inp.className='si'; inp.type='number'; inp.id=id; inp.placeholder='0'; inp.min='0';
+  w.appendChild(l); w.appendChild(inp);
+  return w;
+}
+
+function tog(i) {
+  st.checks[i]=!st.checks[i];
+  var row=document.getElementById('r'+i); var cir=document.getElementById('c'+i);
+  if(st.checks[i]){row.className='check-row done';cir.textContent='✓';}
+  else            {row.className='check-row';      cir.textContent='';}
+  prog();
+}
+
+function prog() {
+  var done=0; for(var i=0;i<st.checks.length;i++) if(st.checks[i]) done++;
+  var pct=st.total?Math.round(done/st.total*100):0;
+  document.getElementById('pf').style.width=pct+'%';
+  document.getElementById('pt').innerHTML='<span>'+done+'/'+st.total+'</span> itens marcados';
+}
+
+function goSend() {
+  var done=0; for(var i=0;i<st.checks.length;i++) if(st.checks[i]) done++;
+  var t=st.turno==='entrada'?'Abertura':'Fechamento';
+  var cat=st.cat==='cozinha'?'Cozinha':'Salão';
+  document.getElementById('ssub').textContent=st.nome+' · '+cat+' · '+t+' · '+hoje()+'\n'+done+' de '+st.total+' itens concluídos.';
+  show('s-send');
+}
+
+function rel() {
+  var t=st.turno==='entrada'?'ABERTURA':'FECHAMENTO';
+  var em=st.turno==='entrada'?'🌅':'🌙';
+  var cat=st.cat==='cozinha'?'COZINHA':'SALÃO';
+  var L=[];
+  L.push(em+' *CHECKLIST DE '+t+' — '+cat+' AlphaBri*');
+  L.push('📅 '+hoje()); L.push('👤 '+st.nome); L.push('');
+  var config=DADOS[st.cat][st.turno]; var grupos=config.grupos; var ci=0;
+  for(var g=0;g<grupos.length;g++){
+    var gr=grupos[g]; L.push('*'+gr.nome+'*');
+    for(var i=0;i<gr.items.length;i++){ L.push((st.checks[ci]?'✅':'⬜')+' '+gr.items[i].t); ci++; }
+    L.push('');
+  }
+  var done=0; for(var j=0;j<st.checks.length;j++) if(st.checks[j]) done++;
+  L.push('Concluído: '+done+'/'+st.total+' itens');
+  if(config.estoque){
+    L.push(''); L.push('*📦 SALGADOS*');
+    for(var s=0;s<SALS.length;s++) L.push('• '+SALS[s]+': '+gv(st.turno+'ss'+s)+' sacolas / '+gv(st.turno+'su'+s)+' unids');
+    L.push(''); L.push('*🍝 BISTRÔ*');
+    for(var b=0;b<4;b++){
+      var nm=gvt(st.turno+'bn'+b); if(!nm) continue;
+      var p=gv(st.turno+'bp'+b); var v=gv(st.turno+'bv'+b);
+      if(st.turno==='entrada') L.push('• '+nm+': '+p+' preparadas / prev. '+v);
+      else                     L.push('• '+nm+': '+p+' vendidas / '+v+' sobra');
+    }
+  }
+  L.push(''); L.push('_Enviado pelo app AlphaBri Bistrô_');
+  return L.join('\n');
+}
+
+function sendWpp()   { window.open('https://wa.me/'+WPP+'?text='+encodeURIComponent(rel()), '_blank'); }
+
+function sendTelegram() {
+  var msg = rel();
+  var url = 'https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage?chat_id=' + TG_CHAT + '&text=' + encodeURIComponent(msg);
+  var img = new Image();
+  img.onload  = function(){ alert('Relatório enviado!'); };
+  img.onerror = function(){ alert('Relatório enviado!'); };
+  img.src = url;
+}
+function sendEmail() {
+  var t=st.turno==='entrada'?'Abertura':'Fechamento'; var cat=st.cat==='cozinha'?'Cozinha':'Salão';
+  var s='[AlphaBri] '+cat+' '+t+' - '+st.nome+' - '+hoje();
+  var b=rel().replace(/\*/g,'').replace(/_/g,'');
+  window.open('mailto:'+MAIL+'?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b), '_blank');
+}
+
+function gv(id)  { var e=document.getElementById(id); return(e&&e.value)?e.value:'—'; }
+function gvt(id) { var e=document.getElementById(id); return e?e.value.trim():''; }
+
+function hoje() {
+  var d=new Date();
+  var ds=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+  var ms=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  return ds[d.getDay()]+', '+d.getDate()+' de '+ms[d.getMonth()]+' de '+d.getFullYear();
+}
+
+function show(id) {
+  var all=document.querySelectorAll('.screen');
+  for(var i=0;i<all.length;i++) all[i].className=all[i].className.replace(/\bactive\b/g,'').trim();
+  document.getElementById(id).className+=' active';
+  var cb=document.getElementById('cbody'); if(cb) cb.scrollTop=0;
+}
+
+function reset() {
+  st={cat:'',turno:'',nome:'',checks:[],total:0};
+  document.getElementById('nome').value='';
+  document.getElementById('btn-e').className='turno-btn';
+  document.getElementById('btn-s').className='turno-btn';
+  document.getElementById('start-btn').disabled=true;
+  show('s-cat');
+}
+</script>
+</body>
+</html>
